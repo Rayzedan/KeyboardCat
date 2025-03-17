@@ -23,6 +23,7 @@ LinuxHandler::LinuxHandler() : m_stream("/dev/input/event3")
         throw std::runtime_error("Can't open /dev/input/event3");
     }
     signal(SIGINT, handle_signal);
+    signal(SIGTERM, handle_signal);
 }
 
 bool LinuxHandler::HasInput()
