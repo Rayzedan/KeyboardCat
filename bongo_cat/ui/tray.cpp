@@ -3,11 +3,11 @@
 #include "SDL3_image/SDL_image.h"
 #include <filesystem>
 #include <sstream>
-#include <iostream>
 
 static void callback_quit(void* handlerPtr, SDL_TrayEntry* invoker)
 {
     BaseHandler* handler = static_cast<BaseHandler*>(handlerPtr);
+    (void)invoker;
     handler->Stop();
 }
 

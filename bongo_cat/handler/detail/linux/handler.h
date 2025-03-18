@@ -4,6 +4,7 @@
 #include "bongo_cat/handler/handler.h"
 #include <linux/input.h>
 #include <array>
+#include <fstream>
 
 class LinuxHandler : public BaseHandler
 {
@@ -16,7 +17,7 @@ private:
     LinuxHandler();
     static void handle_signal(int);
 private:
-    int m_fd;
+    std::ifstream m_stream;
     std::array<char, sizeof(input_event)> m_dataInput;
     struct input_event m_event;
 };

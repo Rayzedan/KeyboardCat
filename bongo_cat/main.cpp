@@ -7,6 +7,8 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <thread>
+#include <atomic>
 
 struct Initializer
 {
@@ -26,7 +28,7 @@ struct Initializer
     }
 };
 
-int main(int argc, char** argv)
+int main()
 {
     try
     {
@@ -42,23 +44,28 @@ int main(int argc, char** argv)
         Renderer renderer(window.GetRawWindow(), frames);
         auto handler = make_handler();
         Tray tray(handler);
-        bool running = true;
+        std::atomic<bool> running = true;
+        std::thread sdlThread([&running]
+        {
+            while (running)
+            {
+                SDL_UpdateTrays();
+                SDL_Delay(100);
+            }
+        });
         while (running)
         {
-            SDL_Event event;
             renderer.Render();
-            while (SDL_PollEvent(&event))
+            if (handler->HasStop())
             {
-                if (event.type == SDL_EVENT_QUIT)
-                {
-                    running = false;
-                }
+                running = false;
             }
             if (handler->HasInput())
             {
                 renderer.Update();
             }
         }
+        sdlThread.join();
     }
     catch (const std::exception& e)
     {
