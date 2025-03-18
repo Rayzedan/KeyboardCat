@@ -7,7 +7,6 @@
 
 static void callback_quit(void* handlerPtr, SDL_TrayEntry* invoker)
 {
-    std::cout << "Call stop" << std::endl;
     BaseHandler* handler = static_cast<BaseHandler*>(handlerPtr);
     handler->Stop();
 }
@@ -22,7 +21,7 @@ Tray::Tray(std::weak_ptr<BaseHandler> handler) : m_handler(handler)
         throw std::runtime_error(ss.str());
     }
     const std::filesystem::path basePath = basePathPtr;
-    static const auto filePath = basePath / "icon64.png";
+    static const auto filePath = basePath / "icon128.png";
     m_icon = IMG_Load(filePath.string().c_str());
     if (m_icon == nullptr)
     {
@@ -37,8 +36,7 @@ Tray::Tray(std::weak_ptr<BaseHandler> handler) : m_handler(handler)
         ss << "Failed to create system tray: " << SDL_GetError() << '\n';
         throw std::runtime_error(ss.str());
     }
-    std::cout << "Here?" << std::endl;
-    m_menu = SDL_CreateTrayMenu(*m_system_tray);;
+    m_menu = SDL_CreateTrayMenu(*m_system_tray);
     if (m_menu == nullptr)
     {
         std::stringstream ss;
@@ -51,6 +49,10 @@ Tray::Tray(std::weak_ptr<BaseHandler> handler) : m_handler(handler)
 
 Tray::~Tray()
 {
+    if (m_icon)
+    {
+        SDL_DestroySurface(m_icon);
+    }
     if (m_system_tray)
     {
         SDL_DestroyTray(*m_system_tray);

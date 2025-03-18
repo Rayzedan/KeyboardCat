@@ -8,6 +8,9 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 # prevent installing to system directories.
 set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE INTERNAL "")
 
+# add_compile_options("-fsanitize=address,undefined")
+# link_libraries("-fsanitize=address,undefined")
+
 # Declare the project
 project(keyboard_cat)
 
@@ -146,6 +149,8 @@ else()
     endmacro()
     copy_helper("bongo_cat.gif")
     copy_helper("icon64.png")
+    copy_helper("icon96.png")
+    copy_helper("icon128.png")
     # copy_helper("bongo_cat2.gif")
 endif()
 

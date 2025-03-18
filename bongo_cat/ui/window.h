@@ -18,7 +18,6 @@ private:
     int m_heigth;
     int m_wX;
     int m_wY;
-    std::unique_ptr<SDL_Tray*> m_system_tray;
     std::unique_ptr<SDL_Window*> m_window;
 };
 

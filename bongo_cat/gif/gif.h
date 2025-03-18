@@ -4,6 +4,15 @@
 #include <vector>
 #include <SDL3/SDL_surface.h>
 
-std::vector<SDL_Surface*> load_gif_frames();
+
+class GifLoader
+{
+public:
+    GifLoader();
+    const std::vector<SDL_Surface*>& GetFrames() const;
+    ~GifLoader();
+private:
+    std::vector<SDL_Surface*> m_frames;
+};
 
 #endif // !GIF_H

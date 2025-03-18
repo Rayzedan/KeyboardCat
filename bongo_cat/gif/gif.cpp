@@ -4,14 +4,12 @@
 #include <iostream>
 #include <filesystem>
 
-std::vector<SDL_Surface*> load_gif_frames()
+GifLoader::GifLoader()
 {
-    std::vector<SDL_Surface*> frames;
-
     auto basePathPtr = SDL_GetBasePath();
     if (basePathPtr == nullptr)
     {
-        return frames;
+        throw std::runtime_error("");
     }
     const std::filesystem::path basePath = basePathPtr;
     static const auto filePath = basePath / "bongo_cat.gif";
@@ -19,14 +17,13 @@ std::vector<SDL_Surface*> load_gif_frames()
     GifFileType* gifFile = DGifOpenFileName(filePath.string().c_str(), nullptr);
     if (!gifFile)
     {
-        std::cerr << "Failed to open GIF file: " << filePath << std::endl;
-        return frames;
+        throw std::runtime_error("");
     }
 
     if (DGifSlurp(gifFile) != GIF_OK)
     {
         DGifCloseFile(gifFile, nullptr);
-        return frames;
+        throw std::runtime_error("");
     }
 
     for (int i = 0; i < gifFile->ImageCount; ++i)
@@ -65,9 +62,24 @@ std::vector<SDL_Surface*> load_gif_frames()
             }
         }
 
-        frames.push_back(surface);
+        m_frames.push_back(surface);
     }
 
     DGifCloseFile(gifFile, nullptr);
-    return frames;
+}
+
+GifLoader::~GifLoader()
+{
+    for (SDL_Surface* ptr : m_frames)
+    {
+        if (ptr != nullptr)
+        {
+            SDL_DestroySurface(ptr);
+        }
+    }
+}
+
+const std::vector<SDL_Surface*>& GifLoader::GetFrames() const
+{
+    return m_frames;
 }

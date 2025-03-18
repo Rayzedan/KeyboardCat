@@ -1,12 +1,12 @@
 #include "bongo_cat/gif/gif.h"
 #include "bongo_cat/handler/handler.h"
 #include "bongo_cat/renderer/renderer.h"
-#include "bongo_cat/ui/window.h"
 #include "bongo_cat/ui/tray.h"
+#include "bongo_cat/ui/window.h"
 #include <SDL3/SDL.h>
 #include <iostream>
-#include <vector>
 #include <sstream>
+#include <vector>
 
 struct Initializer
 {
@@ -26,14 +26,14 @@ struct Initializer
     }
 };
 
-
 int main(int argc, char** argv)
 {
     try
     {
         Initializer init;
         Window& window = Window::Instance(249, 153, -3, -180);
-        const auto frames = load_gif_frames();
+        GifLoader loader;
+        const auto frames = loader.GetFrames();
         if (frames.empty())
         {
             std::cerr << "Failed to load GIF: " << SDL_GetError() << std::endl;
@@ -41,14 +41,18 @@ int main(int argc, char** argv)
         }
         Renderer renderer(window.GetRawWindow(), frames);
         auto handler = make_handler();
-        bool running = true;
         Tray tray(handler);
+        bool running = true;
         while (running)
         {
+            SDL_Event event;
             renderer.Render();
-            if (handler->HasStop())
+            while (SDL_PollEvent(&event))
             {
-                running = false;
+                if (event.type == SDL_EVENT_QUIT)
+                {
+                    running = false;
+                }
             }
             if (handler->HasInput())
             {
