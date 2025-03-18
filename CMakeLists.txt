@@ -42,7 +42,8 @@ endif()
 target_sources(${EXECUTABLE_NAME}
 PRIVATE
     bongo_cat/main.cpp
-    bongo_cat/window/window.cpp
+    bongo_cat/ui/window.cpp
+    bongo_cat/ui/tray.cpp
     bongo_cat/handler/detail/linux/handler.cpp
     bongo_cat/handler/handler.cpp
     bongo_cat/renderer/renderer.cpp
@@ -144,6 +145,7 @@ else()
         )
     endmacro()
     copy_helper("bongo_cat.gif")
+    copy_helper("icon64.png")
     # copy_helper("bongo_cat2.gif")
 endif()
 

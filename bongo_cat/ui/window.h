@@ -1,7 +1,8 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <SDL3/SDL.h>
+#include <SDL3/SDL_video.h>
+#include <SDL3/SDL_tray.h>
 #include <memory>
 
 class Window
@@ -17,6 +18,7 @@ private:
     int m_heigth;
     int m_wX;
     int m_wY;
+    std::unique_ptr<SDL_Tray*> m_system_tray;
     std::unique_ptr<SDL_Window*> m_window;
 };
 

@@ -9,8 +9,9 @@ public:
     BaseHandler() = default;
     virtual bool HasInput() = 0;
     virtual bool HasStop() = 0;
+    virtual void Stop() = 0;
 };
 
-std::unique_ptr<BaseHandler> make_handler();
+std::shared_ptr<BaseHandler> make_handler();
 
 #endif

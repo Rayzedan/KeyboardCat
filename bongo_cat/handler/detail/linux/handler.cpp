@@ -36,3 +36,8 @@ bool LinuxHandler::HasStop()
 {
     return g_stop;
 }
+
+void LinuxHandler::Stop()
+{
+    g_stop = 1;
+}

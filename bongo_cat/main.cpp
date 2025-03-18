@@ -1,7 +1,8 @@
 #include "bongo_cat/gif/gif.h"
 #include "bongo_cat/handler/handler.h"
 #include "bongo_cat/renderer/renderer.h"
-#include "bongo_cat/window/window.h"
+#include "bongo_cat/ui/window.h"
+#include "bongo_cat/ui/tray.h"
 #include <SDL3/SDL.h>
 #include <iostream>
 #include <vector>
@@ -41,7 +42,7 @@ int main(int argc, char** argv)
         Renderer renderer(window.GetRawWindow(), frames);
         auto handler = make_handler();
         bool running = true;
-        SDL_Event event;
+        Tray tray(handler);
         while (running)
         {
             renderer.Render();
