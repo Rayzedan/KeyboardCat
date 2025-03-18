@@ -12,7 +12,6 @@ LinuxHandler& LinuxHandler::Instance()
 
 void LinuxHandler::handle_signal(int)
 {
-    std::cout << "Get signal" << std::endl;
     g_stop = 1;
 }
 

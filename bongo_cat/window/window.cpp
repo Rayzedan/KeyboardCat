@@ -14,7 +14,8 @@ Window::Window(int width, int heigth, int wX, int wY)
 {
     m_window =
         std::make_unique<SDL_Window*>(SDL_CreateWindow("Bongo Cat", m_width, m_heigth,
-            SDL_WINDOW_ALWAYS_ON_TOP | SDL_WINDOW_BORDERLESS | SDL_WINDOW_TRANSPARENT | SDL_WINDOW_UTILITY));
+            SDL_WINDOW_ALWAYS_ON_TOP | SDL_WINDOW_BORDERLESS |
+            SDL_WINDOW_TRANSPARENT | SDL_WINDOW_UTILITY));
     if (!m_window)
     {
         std::stringstream ss;

@@ -28,28 +28,37 @@ struct Initializer
 
 int main(int argc, char** argv)
 {
-    Initializer init;
-    Window& window = Window::Instance(249, 153, -3, -180);
-    const auto frames = load_gif_frames();
-    if (frames.empty())
+    try
     {
-        std::cerr << "Failed to load GIF: " << SDL_GetError() << std::endl;
-        return -1;
+        Initializer init;
+        Window& window = Window::Instance(249, 153, -3, -180);
+        const auto frames = load_gif_frames();
+        if (frames.empty())
+        {
+            std::cerr << "Failed to load GIF: " << SDL_GetError() << std::endl;
+            return -1;
+        }
+        Renderer renderer(window.GetRawWindow(), frames);
+        auto handler = make_handler();
+        bool running = true;
+        SDL_Event event;
+        while (running)
+        {
+            renderer.Render();
+            if (handler->HasStop())
+            {
+                running = false;
+            }
+            if (handler->HasInput())
+            {
+                renderer.Update();
+            }
+        }
     }
-    Renderer renderer(window.GetRawWindow(), frames);
-    auto handler = make_handler();
-    bool running = true;
-    while (running)
+    catch (const std::exception& e)
     {
-        renderer.Render();
-        if (handler->HasStop())
-        {
-            running = false;
-        }
-        if (handler->HasInput())
-        {
-            renderer.Update();
-        }
+        std::cerr << "Get error: " << e.what() << std::endl;
+        return -1;
     }
     return 0;
 }
