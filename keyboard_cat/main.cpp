@@ -1,8 +1,8 @@
-#include "bongo_cat/gif/gif.h"
-#include "bongo_cat/handler/handler.h"
-#include "bongo_cat/renderer/renderer.h"
-#include "bongo_cat/ui/tray.h"
-#include "bongo_cat/ui/window.h"
+#include "keyboard_cat/gif/gif.h"
+#include "keyboard_cat/handler/handler.h"
+#include "keyboard_cat/renderer/renderer.h"
+#include "keyboard_cat/ui/tray.h"
+#include "keyboard_cat/ui/window.h"
 #include <SDL3/SDL.h>
 #include <iostream>
 #include <sstream>

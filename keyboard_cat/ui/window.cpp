@@ -1,5 +1,6 @@
 #include "window.h"
 #include <SDL3/SDL_properties.h>
+#include <SDL3/SDL.h>
 #include <sstream>
 
 Window& Window::Instance(int width, int heigth, int wX, int wY)
@@ -22,8 +23,15 @@ Window::Window(int width, int heigth, int wX, int wY)
         ss << "Failed to create window: " << SDL_GetError() << '\n';
         throw std::runtime_error(ss.str());
     }
-    // TODO: get user screen size
-    SDL_SetWindowPosition(*m_window, 1920 - m_width + m_wX, 1200 - m_heigth + m_wY);
+    SDL_DisplayID display = SDL_GetDisplayForWindow(*m_window);
+    const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(display);
+    if (mode == nullptr)
+    {
+        std::stringstream ss;
+        ss << "Failed to get parameters of current display: " << SDL_GetError() << '\n';
+        throw std::runtime_error(ss.str());
+    }
+    SDL_SetWindowPosition(*m_window, mode->w - m_width + m_wX, mode->h - m_heigth + m_wY);
 }
 
 SDL_Window* Window::GetRawWindow()

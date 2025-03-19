@@ -44,13 +44,13 @@ endif()
 # Add your sources to the target
 target_sources(${EXECUTABLE_NAME}
 PRIVATE
-    bongo_cat/main.cpp
-    bongo_cat/ui/window.cpp
-    bongo_cat/ui/tray.cpp
-    bongo_cat/handler/detail/linux/handler.cpp
-    bongo_cat/handler/handler.cpp
-    bongo_cat/renderer/renderer.cpp
-    bongo_cat/gif/gif.cpp
+    keyboard_cat/main.cpp
+    keyboard_cat/ui/window.cpp
+    keyboard_cat/ui/tray.cpp
+    keyboard_cat/handler/detail/linux/handler.cpp
+    keyboard_cat/handler/handler.cpp
+    keyboard_cat/renderer/renderer.cpp
+    keyboard_cat/gif/gif.cpp
 )
 # What is iosLaunchScreen.storyboard? This file describes what Apple's mobile platforms
 # should show the user while the application is starting up. If you don't include one,
@@ -61,7 +61,7 @@ PRIVATE
 # To get an app icon on Apple platforms, add it to your executable.
 # Afterward, the image file in Info.plist.in.
 # if(APPLE)
-#     target_sources("${EXECUTABLE_NAME}" PRIVATE "bongo_cat/logo.png")
+#     target_sources("${EXECUTABLE_NAME}" PRIVATE "keyboard_cat/logo.png")
 # endif()
 
 # Set C++ version
@@ -110,21 +110,21 @@ target_compile_definitions(${EXECUTABLE_NAME} PUBLIC SDL_MAIN_USE_CALLBACKS)
 if (APPLE)
     # on Apple targets, the application bundle has a "resources" subfolder where we can place our assets.
     # SDL_GetBasePath() gives us easy access to that location.
-    set(input_root "${CMAKE_CURRENT_LIST_DIR}/bongo_cat")
+    set(input_root "${CMAKE_CURRENT_LIST_DIR}/keyboard_cat")
     macro(add_resource FILE)
         file(RELATIVE_PATH relpath "${input_root}" "${FILE}")
         get_filename_component(relpath "${relpath}" DIRECTORY)
         target_sources(${EXECUTABLE_NAME} PRIVATE ${FILE})
         set_property(SOURCE ${FILE} PROPERTY MACOSX_PACKAGE_LOCATION "Resources/${relpath}")
     endmacro()
-    add_resource("${CMAKE_CURRENT_LIST_DIR}/bongo_cat/bongo_cat.gif")
-    # add_resource("${CMAKE_CURRENT_LIST_DIR}/bongo_cat/bongo_cat2.gif")
+    add_resource("${CMAKE_CURRENT_LIST_DIR}//keyboard_cat.gif")
+    # add_resource("${CMAKE_CURRENT_LIST_DIR}/keyboard_cat/bongo_cat2.gif")
 elseif(EMSCRIPTEN)
     # on the web, we have to put the files inside of the webassembly
     # somewhat unintuitively, this is done via a linker argument.
     target_link_libraries(${EXECUTABLE_NAME} PRIVATE
-        "--preload-file \"${CMAKE_CURRENT_LIST_DIR}/bongo_cat/bongo_cat.gif@/\""
-        # "--preload-file \"${CMAKE_CURRENT_LIST_DIR}/bongo_cat/bongo_cat2.gif@/\""
+        "--preload-file \"${CMAKE_CURRENT_LIST_DIR}//keyboard_cat.gif@/\""
+        # "--preload-file \"${CMAKE_CURRENT_LIST_DIR}/keyboard_cat/bongo_cat2.gif@/\""
     )
 else()
     if (ANDROID)
@@ -143,7 +143,7 @@ else()
         endif()
         add_custom_command(POST_BUILD
             TARGET "${EXECUTABLE_NAME}"
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/bongo_cat/${filename}" "${outname}"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/keyboard_cat/${filename}" "${outname}"
             DEPENDS "${filename}"
         )
     endmacro()
@@ -155,9 +155,9 @@ else()
 endif()
 
 # set some extra configs for each platform
-# set(RESOURCE_FILES "bongo_cat/logo.png")
+# set(RESOURCE_FILES "keyboard_cat/logo.png")
 # if(IOS)
-#     set(RESOURCE_FILES "bongo_cat/iosLaunchScreen.storyboard;bongo_cat/logo.png") # make the splash screen show up on iOS
+#     set(RESOURCE_FILES "keyboard_cat/iosLaunchScreen.storyboard;keyboard_cat/logo.png") # make the splash screen show up on iOS
 # endif()
 
 set_target_properties(${EXECUTABLE_NAME} PROPERTIES
@@ -165,7 +165,7 @@ set_target_properties(${EXECUTABLE_NAME} PROPERTIES
     MACOSX_BUNDLE TRUE
     # Set the Info.plist file for Apple Mobile platforms. Without this file, your app
     # will not launch.
-    MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/bongo_cat/Info.plist.in"
+    MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/keyboard_cat/Info.plist.in"
 
     # in Xcode, create a Scheme in the schemes dropdown for the app.
     XCODE_GENERATE_SCHEME TRUE
