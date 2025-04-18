@@ -1,5 +1,7 @@
 #include "handler.h"
 #include "SDL3/SDL_events.h"
+#include "SDL3/SDL_haptic.h"
+
 #include <cstring>
 #include <signal.h>
 #include <iostream>
@@ -20,11 +22,19 @@ void LinuxHandler::handle_signal(int)
     g_stop = 1;
 }
 
-LinuxHandler::LinuxHandler() : m_stream("/dev/input/event3")
+LinuxHandler::LinuxHandler()
 {
+    SDL_KeyboardID* id = SDL_GetKeyboards(NULL);
+    if (id == nullptr)
+    {
+        throw std::runtime_error("Can't get keyboard ID");
+    }
+    std::cout << "Id: " << *id << std::endl;
+    std::cout << "NAME: " << SDL_GetKeyboardNameForID(*id) << std::endl;
+    m_stream.open("/dev/input/event" + std::to_string(*id));
     if (!m_stream)
     {
-        throw std::runtime_error("Can't open /dev/input/event3");
+        throw std::runtime_error("Can't open /dev/input/event" + std::to_string(*id));
     }
     signal(SIGINT, handle_signal);
     signal(SIGTERM, handle_signal);

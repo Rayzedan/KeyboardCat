@@ -48,12 +48,16 @@ GifLoader::GifLoader()
                 GifByteType colorIndex = frame->RasterBits[pixelIndex];
                 GifColorType color = colorMap->Colors[colorIndex];
                 Uint32 pixelColor;
+                // TODO: change all pixel to black
                 if (color.Red >= 240 && color.Green >= 180 && color.Blue >= 180)
                 {
                     pixelColor = 0x00000000;
                 }
                 else
                 {
+                    // pixelColor = 0xFFFFFFFF;
+                    // pixelColor = (255 << 24) | (color.Red << 16) | (color.Green << 8) | color.Blue;
+                    // pixelColor = 255 << 24; // 0xFF000000 (ARGB)
                     pixelColor =
                         (255 << 24) | (color.Red << 16) | (color.Green << 8) | color.Blue;
                 }

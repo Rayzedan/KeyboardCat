@@ -33,6 +33,7 @@ int main()
     try
     {
         Initializer init;
+        // TODO: Get settings from user config like json or smth
         Window& window = Window::Instance(249, 153, -3, -180);
         GifLoader loader;
         const auto frames = loader.GetFrames();
