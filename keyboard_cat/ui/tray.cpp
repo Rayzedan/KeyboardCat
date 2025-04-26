@@ -1,6 +1,6 @@
 #include "tray.h"
-#include "SDL3/SDL_filesystem.h"
-#include "SDL3_image/SDL_image.h"
+#include <SDL3/SDL_filesystem.h>
+#include <SDL3/SDL.h>
 #include <filesystem>
 #include <sstream>
 
@@ -19,8 +19,8 @@ Tray::Tray()
         throw std::runtime_error(ss.str());
     }
     const std::filesystem::path basePath = basePathPtr;
-    static const auto filePath = basePath / "icon128.png";
-    m_icon = IMG_Load(filePath.string().c_str());
+    static const auto filePath = basePath / "icon128.bmp";
+    m_icon = SDL_LoadBMP(filePath.string().c_str());
     if (m_icon == nullptr)
     {
         std::stringstream ss;

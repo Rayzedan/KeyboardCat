@@ -1,7 +1,10 @@
 #include "renderer.h"
 #include <sstream>
 
-Renderer::Renderer(SDL_Window* window, const std::vector<SDL_Surface*>& frames) : m_currentFrame(0), m_frames(frames), m_window(window)
+Renderer::Renderer(SDL_Window* window, const std::vector<SDL_Surface*>& frames) :
+    m_currentFrame(0),
+    m_frames(frames),
+    m_window(window)
 {
     if (m_window == nullptr)
     {
