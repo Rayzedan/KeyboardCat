@@ -81,6 +81,10 @@ bool DarwinHandler::HasInput()
         return false;
 
     m_inputFlag = false;
+
+    SDL_Event e;
+    e.type = SDL_EVENT_KEY_DOWN;
+    SDL_PushEvent(&e);
     return true;
 }
 

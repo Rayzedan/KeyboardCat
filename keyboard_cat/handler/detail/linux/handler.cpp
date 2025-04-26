@@ -38,7 +38,13 @@ bool LinuxHandler::HasInput()
     {
         m_stream.read(m_dataInput.data(), m_dataInput.size());
         std::memcpy(&m_event, m_dataInput.data(), m_dataInput.size());
-        return m_event.type == EV_KEY && m_event.value == 1;
+        if (m_event.type == EV_KEY && m_event.value == 1)
+        {
+            SDL_Event e;
+            e.type = SDL_EVENT_QUIT;
+            SDL_PushEvent(&e);
+            return true;
+        }
     }
     return false;
 }

@@ -45,31 +45,38 @@ int main()
         Renderer renderer(window.GetRawWindow(), frames);
         auto handler = make_handler();
         Tray tray;
+        std::atomic<bool> hasInput = false;
         std::atomic<bool> running = true;
-        std::thread sdlThread([&running]
+        std::thread inputThread([&handler, &hasInput, &running]
         {
             while (running)
             {
-                SDL_UpdateTrays();
-                SDL_Delay(100);
+                hasInput = handler->HasInput();
             }
         });
-
+        renderer.Render();
         while (running)
         {
             SDL_Event event;
-            SDL_PollEvent(&event);
-            renderer.Render();
-            if (handler->HasStop() || event.type == SDL_EVENT_QUIT)
+            SDL_WaitEvent(&event);
+            if (event.type == SDL_EVENT_QUIT)
             {
                 running = false;
+                break;
             }
-            if (handler->HasInput())
+            if (handler->HasStop())
+            {
+                running = false;
+                break;
+            }
+            if (event.type == SDL_EVENT_KEY_DOWN)
             {
                 renderer.Update();
+                renderer.Render();
+                hasInput = false;
             }
         }
-        sdlThread.join();
+        inputThread.join();
     }
     catch (const std::exception& e)
     {
