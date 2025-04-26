@@ -9,12 +9,11 @@
 class LinuxHandler : public BaseHandler
 {
 public:
-    static LinuxHandler& Instance();
+    LinuxHandler();
     bool HasInput() override;
     bool HasStop() override;
     void Stop() override;
 private:
-    LinuxHandler();
     static void handle_signal(int);
 private:
     std::ifstream m_stream;

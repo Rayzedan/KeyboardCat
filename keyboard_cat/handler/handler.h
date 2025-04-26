@@ -6,12 +6,12 @@
 class BaseHandler
 {
 public:
-    BaseHandler() = default;
+    virtual ~BaseHandler() = default;
     virtual bool HasInput() = 0;
     virtual bool HasStop() = 0;
     virtual void Stop() = 0;
 };
 
-std::shared_ptr<BaseHandler> make_handler();
+std::unique_ptr<BaseHandler> make_handler();
 
 #endif

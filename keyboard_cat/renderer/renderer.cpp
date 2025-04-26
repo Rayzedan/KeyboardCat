@@ -1,13 +1,13 @@
 #include "renderer.h"
 #include <sstream>
 
-Renderer::Renderer(SDL_Window* window, const std::vector<SDL_Surface*>& frames) : m_currentFrame(0), m_frames(frames)
+Renderer::Renderer(SDL_Window* window, const std::vector<SDL_Surface*>& frames) : m_currentFrame(0), m_frames(frames), m_window(window)
 {
-    if (window == nullptr)
+    if (m_window == nullptr)
     {
         throw std::invalid_argument("Passing nullptr window to renderer");
     }
-    m_renderer = std::make_unique<SDL_Renderer*>(SDL_CreateRenderer(window, nullptr));
+    m_renderer = std::make_unique<SDL_Renderer*>(SDL_CreateRenderer(m_window, nullptr));
     if (!m_renderer)
     {
         std::stringstream ss;
@@ -22,10 +22,20 @@ void Renderer::Render()
     SDL_SetRenderDrawColor(renderPtr, 0, 0, 0, 0);
     SDL_RenderClear(renderPtr);
 
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderPtr, m_frames[m_currentFrame]);
+    auto surface = m_frames[m_currentFrame];
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderPtr, surface);
     if (texture)
     {
-        SDL_RenderTexture(renderPtr, texture, nullptr, nullptr);
+        int winW, winH;
+        SDL_GetWindowSize(m_window, &winW, &winH);
+
+        SDL_FRect dstRect = {
+            (winW - surface->w) / 2.0f,
+            (winH - surface->h) / 2.0f,
+            static_cast<float>(surface->w),
+            static_cast<float>(surface->h)
+        };
+        SDL_RenderTexture(renderPtr, texture, nullptr, &dstRect);
         SDL_DestroyTexture(texture);
     }
     SDL_RenderPresent(renderPtr);
@@ -33,5 +43,10 @@ void Renderer::Render()
 
 void Renderer::Update()
 {
-    m_currentFrame = (m_currentFrame == 0) ? 3 : 0;
+    if (m_currentFrame + 1 >= m_frames.size())
+    {
+        m_currentFrame = 0;
+        return;
+    }
+    ++m_currentFrame;
 }

@@ -15,6 +15,7 @@ private:
     size_t m_currentFrame;
     const std::vector<SDL_Surface*>& m_frames;
     std::unique_ptr<SDL_Renderer*> m_renderer;
+    SDL_Window* m_window;
 };
 
 

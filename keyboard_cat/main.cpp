@@ -34,7 +34,7 @@ int main()
     {
         Initializer init;
         // TODO: Get settings from user config like json or smth
-        Window& window = Window::Instance(249, 153, -3, -180);
+        Window& window = Window::Instance(200, 123, -3, -180);
         GifLoader loader;
         const auto frames = loader.GetFrames();
         if (frames.empty())
@@ -44,7 +44,7 @@ int main()
         }
         Renderer renderer(window.GetRawWindow(), frames);
         auto handler = make_handler();
-        Tray tray(handler);
+        Tray tray;
         std::atomic<bool> running = true;
         std::thread sdlThread([&running]
         {
@@ -54,10 +54,13 @@ int main()
                 SDL_Delay(100);
             }
         });
+
         while (running)
         {
+            SDL_Event event;
+            SDL_PollEvent(&event);
             renderer.Render();
-            if (handler->HasStop())
+            if (handler->HasStop() || event.type == SDL_EVENT_QUIT)
             {
                 running = false;
             }

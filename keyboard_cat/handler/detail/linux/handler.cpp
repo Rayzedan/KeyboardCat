@@ -8,12 +8,6 @@
 
 sig_atomic_t g_stop = 0;
 
-LinuxHandler& LinuxHandler::Instance()
-{
-    static LinuxHandler handler;
-    return handler;
-}
-
 void LinuxHandler::handle_signal(int)
 {
     SDL_Event e;
@@ -29,8 +23,6 @@ LinuxHandler::LinuxHandler()
     {
         throw std::runtime_error("Can't get keyboard ID");
     }
-    std::cout << "Id: " << *id << std::endl;
-    std::cout << "NAME: " << SDL_GetKeyboardNameForID(*id) << std::endl;
     m_stream.open("/dev/input/event" + std::to_string(*id));
     if (!m_stream)
     {

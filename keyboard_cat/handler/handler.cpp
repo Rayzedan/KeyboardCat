@@ -1,9 +1,17 @@
 #include "handler.h"
-// TODO: add define for UNIX/Windows
+#if __linux__
 #include "keyboard_cat/handler/detail/linux/handler.h"
+#elif __APPLE__
+#include "keyboard_cat/handler/detail/macos/handler.h"
+#endif
 
-std::shared_ptr<BaseHandler> make_handler()
+std::unique_ptr<BaseHandler> make_handler()
 {
-    return std::make_shared<LinuxHandler>(std::move(LinuxHandler::Instance()));
+#if __linux__
+    return std::make_unique<LinuxHandler>();
+#endif
+#if __APPLE__
+    return std::make_unique<DarwinHandler>();
+#endif
 
 }

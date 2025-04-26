@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <SDL3/SDL_surface.h>
+#include <set>
 
 
 class GifLoader

@@ -7,12 +7,16 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 
 # prevent installing to system directories.
 set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE INTERNAL "")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wformat -Wformat-security -Werror -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wformat -Wformat-security -Werror -g")
 # add_compile_options("-fsanitize=address,undefined")
 # link_libraries("-fsanitize=address,undefined")
 
 # Declare the project
 project(keyboard_cat)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")    # Disable shared builds on platforms where it does not make sense to use them
 
 if ((APPLE AND NOT CMAKE_SYSTEM_NAME MATCHES "Darwin") OR EMSCRIPTEN)
     set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")    # Disable shared builds on platforms where it does not make sense to use them
@@ -41,13 +45,20 @@ else()
     add_executable(${EXECUTABLE_NAME})
 endif()
 
+
+if (APPLE)
+    set(HANDLER_SOURCE "keyboard_cat/handler/detail/macos/handler.cpp")
+else ()
+    set(HANDLER_SOURCE "keyboard_cat/handler/detail/linux/handler.cpp")
+endif ()
+
 # Add your sources to the target
 target_sources(${EXECUTABLE_NAME}
 PRIVATE
     keyboard_cat/main.cpp
     keyboard_cat/ui/window.cpp
     keyboard_cat/ui/tray.cpp
-    keyboard_cat/handler/detail/linux/handler.cpp
+    ${HANDLER_SOURCE}
     keyboard_cat/handler/handler.cpp
     keyboard_cat/renderer/renderer.cpp
     keyboard_cat/gif/gif.cpp
@@ -96,12 +107,14 @@ target_link_libraries(${EXECUTABLE_NAME} PUBLIC
 
 # SDL_Image bug: https://github.com/libsdl-org/SDL_image/issues/506
 if (APPLE AND NOT BUILD_SHARED_LIBS)
+    message("HERE!")
     find_library(IO_LIB ImageIO REQUIRED)
     find_library(CS_LIB CoreServices REQUIRED)
     find_library(CT_LIB CoreText REQUIRED)
     find_library(CG_LIB CoreGraphics REQUIRED)
     find_library(CF_LIB CoreFoundation REQUIRED)
-    target_link_libraries(${EXECUTABLE_NAME} PUBLIC ${CF_LIB} ${CT_LIB} ${IO_LIB} ${CS_LIB} ${CG_LIB})
+    find_library(CA_LIB Cocoa REQUIRED)
+    target_link_libraries(${EXECUTABLE_NAME} PUBLIC ${CF_LIB} ${CT_LIB} ${IO_LIB} ${CS_LIB} ${CG_LIB} ${CA_LIB})
 endif()
 target_compile_definitions(${EXECUTABLE_NAME} PUBLIC SDL_MAIN_USE_CALLBACKS)
 
@@ -117,14 +130,14 @@ if (APPLE)
         target_sources(${EXECUTABLE_NAME} PRIVATE ${FILE})
         set_property(SOURCE ${FILE} PROPERTY MACOSX_PACKAGE_LOCATION "Resources/${relpath}")
     endmacro()
-    add_resource("${CMAKE_CURRENT_LIST_DIR}//keyboard_cat.gif")
-    # add_resource("${CMAKE_CURRENT_LIST_DIR}/keyboard_cat/bongo_cat2.gif")
+    add_resource("${CMAKE_CURRENT_LIST_DIR}/keyboard_cat/bongo_cat.gif")
+    add_resource("${CMAKE_CURRENT_LIST_DIR}/keyboard_cat/hallow_cat.gif")
+    add_resource("${CMAKE_CURRENT_LIST_DIR}/keyboard_cat/icon128.png")
 elseif(EMSCRIPTEN)
     # on the web, we have to put the files inside of the webassembly
     # somewhat unintuitively, this is done via a linker argument.
     target_link_libraries(${EXECUTABLE_NAME} PRIVATE
         "--preload-file \"${CMAKE_CURRENT_LIST_DIR}//keyboard_cat.gif@/\""
-        # "--preload-file \"${CMAKE_CURRENT_LIST_DIR}/keyboard_cat/bongo_cat2.gif@/\""
     )
 else()
     if (ANDROID)
@@ -151,7 +164,6 @@ else()
     copy_helper("icon64.png")
     copy_helper("icon96.png")
     copy_helper("icon128.png")
-    # copy_helper("bongo_cat2.gif")
 endif()
 
 # set some extra configs for each platform
@@ -165,7 +177,7 @@ set_target_properties(${EXECUTABLE_NAME} PROPERTIES
     MACOSX_BUNDLE TRUE
     # Set the Info.plist file for Apple Mobile platforms. Without this file, your app
     # will not launch.
-    MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/keyboard_cat/Info.plist.in"
+    # MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/keyboard_cat/Info.plist.in"
 
     # in Xcode, create a Scheme in the schemes dropdown for the app.
     XCODE_GENERATE_SCHEME TRUE

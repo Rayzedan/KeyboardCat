@@ -4,14 +4,12 @@
 #include <filesystem>
 #include <sstream>
 
-static void callback_quit(void* handlerPtr, SDL_TrayEntry* invoker)
+static void callback_quit([[maybe_unused]] void* handlerPtr, [[maybe_unused]] SDL_TrayEntry* invoker)
 {
-    BaseHandler* handler = static_cast<BaseHandler*>(handlerPtr);
-    (void)invoker;
-    handler->Stop();
+    std::exit(0);
 }
 
-Tray::Tray(std::weak_ptr<BaseHandler> handler) : m_handler(handler)
+Tray::Tray()
 {
     auto basePathPtr = SDL_GetBasePath();
     if (basePathPtr == nullptr)
@@ -44,7 +42,7 @@ Tray::Tray(std::weak_ptr<BaseHandler> handler) : m_handler(handler)
         throw std::runtime_error(ss.str());
     }
     m_entry = SDL_InsertTrayEntryAt(m_menu, -1, "Stop", SDL_TRAYENTRY_BUTTON);
-    SDL_SetTrayEntryCallback(m_entry, callback_quit, m_handler.lock().get());
+    SDL_SetTrayEntryCallback(m_entry, callback_quit, NULL);
 }
 
 Tray::~Tray()

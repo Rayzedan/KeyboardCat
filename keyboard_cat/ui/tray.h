@@ -8,11 +8,10 @@
 class Tray
 {
 public:
-    Tray(std::weak_ptr<BaseHandler> handler);
+    Tray();
     ~Tray();
 private:
     SDL_Surface* m_icon;
-    std::weak_ptr<BaseHandler> m_handler;
     std::unique_ptr<SDL_Tray*> m_system_tray;
     SDL_TrayMenu* m_menu;
     SDL_TrayEntry* m_entry;
