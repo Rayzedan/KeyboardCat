@@ -1,6 +1,5 @@
 #include "handler.h"
-#include "SDL3/SDL_events.h"
-
+#include <SDL3/SDL_events.h>
 #include <atomic>
 #include <cstring>
 
@@ -15,9 +14,7 @@ DarwinHandler::DarwinHandler() : m_event(make_event(this))
     }
     signal(SIGINT, handle_signal);
     signal(SIGTERM, handle_signal);
-    m_handler_thread = std::thread([this]() {
-        launch(m_event);
-    });
+    m_handler_thread = std::thread([this]() { launch(m_event); });
 }
 
 DarwinHandler::~DarwinHandler()
@@ -37,8 +34,8 @@ void DarwinHandler::handle_signal(int sig)
     g_stop = 1;
 }
 
-CGEventRef DarwinHandler::keyboard_callback([[maybe_unused]] CGEventTapProxy proxy, CGEventType type,
-    CGEventRef event, void* userInfo)
+CGEventRef DarwinHandler::keyboard_callback([[maybe_unused]] CGEventTapProxy proxy,
+    CGEventType type, CGEventRef event, void* userInfo)
 {
     auto* handler = static_cast<DarwinHandler*>(userInfo);
     if (type == kCGEventKeyDown)
@@ -56,8 +53,8 @@ CGEventRef DarwinHandler::keyboard_callback([[maybe_unused]] CGEventTapProxy pro
 CFMachPortRef DarwinHandler::make_event(DarwinHandler* self)
 {
     return CGEventTapCreate(kCGHIDEventTap, kCGHeadInsertEventTap,
-        kCGEventTapOptionListenOnly,
-        CGEventMaskBit(kCGEventKeyDown), keyboard_callback, self);
+        kCGEventTapOptionListenOnly, CGEventMaskBit(kCGEventKeyDown), keyboard_callback,
+        self);
 }
 
 void DarwinHandler::launch(CFMachPortRef eventTap)
