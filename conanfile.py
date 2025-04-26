@@ -21,12 +21,17 @@ class KeyboardCatRecipe(ConanFile):
         tc = CMakeToolchain(self)
         tc.variables["BUILD_SHARED_LIBS"] = False
         tc.variables["SDL_SHARED"] = True
-        tc.variables["SDLIMAGE_VENDORED"] = True
         tc.variables["SDLIMAGE_AVIF"] = False
         tc.variables["SDLIMAGE_BMP"] = False
         tc.variables["SDLIMAGE_JPEG"] = False
         tc.variables["SDLIMAGE_WEBP"] = False
         tc.generate()
+
+
+    def configure(self):
+        if self.settings.os == "Linux":
+            self.options["sdl"].wayland = False
+            self.options["sdl"].x11 = True
 
     def layout(self):
         cmake_layout(self)
