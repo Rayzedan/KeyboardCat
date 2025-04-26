@@ -41,7 +41,7 @@ bool LinuxHandler::HasInput()
         if (m_event.type == EV_KEY && m_event.value == 1)
         {
             SDL_Event e;
-            e.type = SDL_EVENT_QUIT;
+            e.type = SDL_EVENT_KEY_DOWN;
             SDL_PushEvent(&e);
             return true;
         }

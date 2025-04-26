@@ -4,6 +4,7 @@
 #include "keyboard_cat/ui/tray.h"
 #include "keyboard_cat/ui/window.h"
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_tray.h>
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -58,22 +59,24 @@ int main()
         while (running)
         {
             SDL_Event event;
-            SDL_WaitEvent(&event);
-            if (event.type == SDL_EVENT_QUIT)
+            while (SDL_PollEvent(&event))
             {
-                running = false;
-                break;
-            }
-            if (handler->HasStop())
-            {
-                running = false;
-                break;
-            }
-            if (event.type == SDL_EVENT_KEY_DOWN)
-            {
-                renderer.Update();
-                renderer.Render();
-                hasInput = false;
+                if (event.type == SDL_EVENT_QUIT)
+                {
+                    running = false;
+                    break;
+                }
+                if (handler->HasStop())
+                {
+                    running = false;
+                    break;
+                }
+                if (event.type == SDL_EVENT_KEY_DOWN)
+                {
+                    renderer.Update();
+                    renderer.Render();
+                    hasInput = false;
+                }
             }
         }
         inputThread.join();

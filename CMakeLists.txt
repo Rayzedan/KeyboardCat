@@ -63,8 +63,8 @@ else()
             DEPENDS "${filename}"
         )
     endmacro()
-    copy_helper("bongo_cat.gif")
-    copy_helper("icon128.png")
+    copy_helper("hallow_cat.gif")
+    copy_helper("icon128.bmp")
 endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
