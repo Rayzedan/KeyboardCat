@@ -1,15 +1,14 @@
 #include "gif.h"
-#include "SDL3/SDL_filesystem.h"
-#include <filesystem>
+#include <SDL3/SDL_filesystem.h>
 #include <gif_lib.h>
-#include <iostream>
+#include <filesystem>
 
 GifLoader::GifLoader()
 {
     auto basePathPtr = SDL_GetBasePath();
     if (basePathPtr == nullptr)
     {
-        throw std::runtime_error("");
+        throw std::runtime_error("Can't get sdl base path");
     }
     const std::filesystem::path basePath = basePathPtr;
     static const auto filePath = basePath / "hallow_cat.gif";
@@ -17,13 +16,13 @@ GifLoader::GifLoader()
     GifFileType* gifFile = DGifOpenFileName(filePath.string().c_str(), nullptr);
     if (!gifFile)
     {
-        throw std::runtime_error("");
+        throw std::runtime_error("Can't find gif file");
     }
 
     if (DGifSlurp(gifFile) != GIF_OK)
     {
         DGifCloseFile(gifFile, nullptr);
-        throw std::runtime_error("");
+        throw std::runtime_error("Can't extract data from gif file");
     }
 
     int transparentIndex = -1;
@@ -49,12 +48,9 @@ GifLoader::GifLoader()
 
         SDL_Surface* surface = SDL_CreateSurface(frame->ImageDesc.Width,
             frame->ImageDesc.Height, SDL_PIXELFORMAT_ARGB8888);
-         std::cout << frame->ImageDesc.Width << std::endl;
-         std::cout << frame->ImageDesc.Height << std::endl;
         if (!surface)
         {
-            std::cerr << "Failed to create surface for frame " << i << std::endl;
-            continue;
+            throw std::runtime_error("Failed to create surface for frame");
         }
 
         Uint32* pixels = static_cast<Uint32*>(surface->pixels);
