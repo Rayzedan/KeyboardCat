@@ -2,13 +2,15 @@
 #include <sstream>
 
 Renderer::Renderer(SDL_Window* window, const std::vector<SDL_Surface*>& frames) :
+    m_windowW(0),
+    m_windowH(0),
     m_currentFrame(0),
     m_frames(frames),
     m_window(window)
 {
     if (m_window == nullptr)
     {
-        throw std::invalid_argument("Passing nullptr window to renderer");
+        throw std::invalid_argument("Passing invalid window to renderer");
     }
     m_renderer = std::make_unique<SDL_Renderer*>(SDL_CreateRenderer(m_window, nullptr));
     if (!m_renderer)
@@ -17,6 +19,7 @@ Renderer::Renderer(SDL_Window* window, const std::vector<SDL_Surface*>& frames) 
         ss << "Failed to create renderer: " << SDL_GetError() << '\n';
         throw std::runtime_error(ss.str());
     }
+    SDL_GetWindowSize(m_window, &m_windowW, &m_windowH);
 }
 
 void Renderer::Render()
@@ -29,12 +32,9 @@ void Renderer::Render()
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderPtr, surface);
     if (texture)
     {
-        int winW, winH;
-        SDL_GetWindowSize(m_window, &winW, &winH);
-
         SDL_FRect dstRect = {
-            (winW - surface->w) / 2.0f,
-            (winH - surface->h) / 2.0f,
+            (m_windowW - surface->w) / 2.0f,
+            (m_windowH - surface->h) / 2.0f,
             static_cast<float>(surface->w),
             static_cast<float>(surface->h)
         };

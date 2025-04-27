@@ -40,8 +40,7 @@ int main()
         const auto frames = loader.GetFrames();
         if (frames.empty())
         {
-            std::cerr << "Failed to load GIF: " << SDL_GetError() << std::endl;
-            return -1;
+            throw std::runtime_error("Failed to load GIF: " + std::string(SDL_GetError()));
         }
         Renderer renderer(window.GetRawWindow(), frames);
         auto handler = make_handler();
