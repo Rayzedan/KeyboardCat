@@ -9,8 +9,6 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include <thread>
-#include <atomic>
 
 constexpr std::string_view g_config_path = "config.toml";
 
