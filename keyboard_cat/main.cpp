@@ -1,34 +1,16 @@
 #include "keyboard_cat/config/config.h"
 #include "keyboard_cat/gif/gif.h"
 #include "keyboard_cat/handler/handler.h"
+#include "keyboard_cat/init/init.h"
 #include "keyboard_cat/renderer/renderer.h"
 #include "keyboard_cat/ui/tray.h"
 #include "keyboard_cat/ui/window.h"
-#include <SDL3/SDL.h>
-#include <SDL3/SDL_tray.h>
+#include <SDL3/SDL_events.h>
 #include <iostream>
-#include <sstream>
 #include <vector>
 
+// @TODO: must be configure from CMake
 constexpr std::string_view g_config_path = "config.toml";
-
-struct Initializer
-{
-    Initializer()
-    {
-        if (!SDL_Init(SDL_INIT_VIDEO))
-        {
-            std::stringstream ss;
-            ss << "Failed to initialize SDL: " << SDL_GetError() << '\n';
-            throw std::runtime_error(ss.str());
-        }
-    }
-
-    ~Initializer()
-    {
-        SDL_Quit();
-    }
-};
 
 int main()
 {
@@ -39,15 +21,11 @@ int main()
         Window& window = Window::Instance(config.Load(g_config_path));
         GifLoader loader;
         const auto frames = loader.GetFrames();
-        if (frames.empty())
-        {
-            throw std::runtime_error("Failed to load GIF: " + std::string(SDL_GetError()));
-        }
         Renderer renderer(window.GetRawWindow(), frames);
         auto handler = make_handler();
         Tray tray;
-        bool running = true;
         renderer.Render();
+        bool running = true;
         while (running)
         {
             SDL_Event event;
@@ -80,6 +58,7 @@ int main()
         if (!config.Save(g_config_path, window.GetCurrentParameters()))
         {
             std::cerr << "Get error while saving new config" << std::endl;
+            return -1;
         }
     }
     catch (const std::exception& e)

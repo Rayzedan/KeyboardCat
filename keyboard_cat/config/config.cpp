@@ -25,8 +25,6 @@ ApplicationParameters Config::Load(const std::filesystem::path& path) const
 
         if (auto tbl = config["window"].as_table())
         {
-            window.windowHeight = tbl->get("height")->value_or(window.windowHeight);
-            window.windowWidth = tbl->get("width")->value_or(window.windowWidth);
             window.offsetX = tbl->get("offset_x")->value_or(window.offsetX);
             window.offsetY = tbl->get("offset_y")->value_or(window.offsetY);
         }
@@ -65,8 +63,6 @@ bool Config::Save(const std::filesystem::path& path,
 
         const auto& window = parameters.windowSize;
         toml::table config{{"window", toml::table{
-                                          {"height", window.windowHeight},
-                                          {"width", window.windowWidth},
                                           {"offset_x", window.offsetX},
                                           {"offset_y", window.offsetY},
                                       }}};

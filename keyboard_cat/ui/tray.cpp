@@ -43,7 +43,7 @@ Tray::Tray()
         ss << "Failed to create system menu: " << SDL_GetError() << '\n';
         throw std::runtime_error(ss.str());
     }
-    m_entry = SDL_InsertTrayEntryAt(m_menu, -1, "Stop", SDL_TRAYENTRY_BUTTON);
+    m_entry = SDL_InsertTrayEntryAt(m_menu, -1, "Quit", SDL_TRAYENTRY_BUTTON);
     SDL_SetTrayEntryCallback(m_entry, callback_quit, NULL);
 }
 

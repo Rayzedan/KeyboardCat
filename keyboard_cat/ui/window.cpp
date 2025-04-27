@@ -2,7 +2,6 @@
 #include <SDL3/SDL_properties.h>
 #include <SDL3/SDL.h>
 #include <sstream>
-#include <iostream>
 
 Window& Window::Instance(const ApplicationParameters& parameters)
 {
@@ -10,7 +9,6 @@ Window& Window::Instance(const ApplicationParameters& parameters)
     static Window window(width, height, wX, wY);
     return window;
 }
-
 
 static std::pair<int, int> GetDisplaySize(SDL_Window* window)
 {
