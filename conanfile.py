@@ -16,6 +16,7 @@ class KeyboardCatRecipe(ConanFile):
     def requirements(self):
         self.requires("sdl/3.2.6")
         self.requires("giflib/5.2.1")
+        self.requires("tomlplusplus/3.4.0")
 
     def generate(self):
         tc = CMakeToolchain(self)
@@ -26,7 +27,6 @@ class KeyboardCatRecipe(ConanFile):
         tc.variables["SDLIMAGE_JPEG"] = False
         tc.variables["SDLIMAGE_WEBP"] = False
         tc.generate()
-
 
     def configure(self):
         if self.settings.os == "Linux":
@@ -45,8 +45,10 @@ class KeyboardCatRecipe(ConanFile):
         cmake = CMake(self)
         cmake.install()
 
-        copy(self, "*.gif", src="resources", dst=os.path.join(self.package_folder, "resources"))
-        copy(self, "*.bmp", src="resources", dst=os.path.join(self.package_folder, "resources"))
+        copy(self, "*.gif", src="resources",
+             dst=os.path.join(self.package_folder, "resources"))
+        copy(self, "*.bmp", src="resources",
+             dst=os.path.join(self.package_folder, "resources"))
 
     def package_info(self):
         self.cpp_info.libs = ["keyboard_cat"]

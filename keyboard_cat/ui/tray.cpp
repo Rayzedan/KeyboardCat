@@ -6,7 +6,9 @@
 
 static void callback_quit([[maybe_unused]] void* handlerPtr, [[maybe_unused]] SDL_TrayEntry* invoker)
 {
-    std::exit(0);
+    SDL_Event event;
+    event.type = SDL_EVENT_QUIT;
+    SDL_PushEvent(&event);
 }
 
 Tray::Tray()
@@ -41,7 +43,7 @@ Tray::Tray()
         ss << "Failed to create system menu: " << SDL_GetError() << '\n';
         throw std::runtime_error(ss.str());
     }
-    m_entry = SDL_InsertTrayEntryAt(m_menu, -1, "Stop", SDL_TRAYENTRY_BUTTON);
+    m_entry = SDL_InsertTrayEntryAt(m_menu, -1, "Quit", SDL_TRAYENTRY_BUTTON);
     SDL_SetTrayEntryCallback(m_entry, callback_quit, NULL);
 }
 

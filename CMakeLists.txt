@@ -10,6 +10,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(SDL3 REQUIRED)
 find_package(GIF REQUIRED)
+find_package(tomlplusplus REQUIRED)
 
 if (APPLE)
     set(HANDLER_SOURCE "keyboard_cat/handler/detail/macos/handler.cpp")
@@ -19,6 +20,8 @@ endif ()
 
 add_executable(${PROJECT_NAME}
     keyboard_cat/main.cpp
+    keyboard_cat/config/config.cpp
+    keyboard_cat/init/init.cpp
     keyboard_cat/ui/window.cpp
     keyboard_cat/ui/tray.cpp
     ${HANDLER_SOURCE}
@@ -33,6 +36,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME} PRIVATE
     SDL3::SDL3
     GIF::GIF
+    tomlplusplus::tomlplusplus
 )
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC SDL_MAIN_USE_CALLBACKS)

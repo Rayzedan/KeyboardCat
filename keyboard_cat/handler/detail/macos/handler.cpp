@@ -1,7 +1,8 @@
 #include "handler.h"
 #include <SDL3/SDL_events.h>
-#include <atomic>
 #include <cstring>
+#include <signal.h>
+#include <atomic>
 
 std::atomic<bool> g_input = false;
 sig_atomic_t g_stop = 0;
@@ -15,6 +16,7 @@ DarwinHandler::DarwinHandler() : m_event(make_event(this))
     signal(SIGINT, handle_signal);
     signal(SIGTERM, handle_signal);
     m_handler_thread = std::thread([this]() { launch(m_event); });
+    m_input_thread = std::thread([this]() { while (!g_stop) CheckInput(); });
 }
 
 DarwinHandler::~DarwinHandler()
@@ -23,14 +25,19 @@ DarwinHandler::~DarwinHandler()
     {
         CFRelease(m_event);
     }
+    if (m_handler_thread.joinable())
+    {
+        m_handler_thread.detach();
+    }
+    if (m_input_thread.joinable())
+    {
+        m_input_thread.detach();
+    }
 }
 
 void DarwinHandler::handle_signal(int sig)
 {
     (void)sig;
-    SDL_Event e;
-    e.type = SDL_EVENT_QUIT;
-    SDL_PushEvent(&e);
     g_stop = 1;
 }
 
@@ -69,30 +76,28 @@ void DarwinHandler::launch(CFMachPortRef eventTap)
     CFRunLoopRun();
 }
 
-bool DarwinHandler::HasInput()
+void DarwinHandler::CheckInput()
 {
     std::unique_lock<std::mutex> lock(m_mutex);
-    m_cv.wait(lock, [this]() { return m_inputFlag || m_stop.load(); });
+    m_cv.wait(lock, [this]() { return m_inputFlag || g_stop; });
 
-    if (m_stop)
-        return false;
-
-    m_inputFlag = false;
-
-    SDL_Event e;
-    e.type = SDL_EVENT_KEY_DOWN;
-    SDL_PushEvent(&e);
-    return true;
+    if (!g_stop)
+    {
+        m_inputFlag = false;
+        SDL_Event e;
+        e.type = SDL_EVENT_KEY_DOWN;
+        SDL_PushEvent(&e);
+    }
 }
 
 bool DarwinHandler::HasStop()
 {
-    return m_stop || g_stop;
+    return g_stop;
 }
 
 void DarwinHandler::Stop()
 {
-    m_stop = true;
+    g_stop = 1;
     m_cv.notify_all();
     CFRunLoopStop(CFRunLoopGetCurrent());
 }

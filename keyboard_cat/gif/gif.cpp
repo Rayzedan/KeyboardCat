@@ -94,5 +94,9 @@ GifLoader::~GifLoader()
 
 const std::vector<SDL_Surface*>& GifLoader::GetFrames() const
 {
+    if (m_frames.empty())
+    {
+        throw std::runtime_error("Failed to load GIF: " + std::string(SDL_GetError()));
+    }
     return m_frames;
 }

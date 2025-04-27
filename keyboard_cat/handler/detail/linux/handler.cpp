@@ -1,6 +1,5 @@
 #include "handler.h"
 #include "SDL3/SDL_events.h"
-#include "SDL3/SDL_haptic.h"
 
 #include <cstring>
 #include <signal.h>
@@ -10,9 +9,6 @@ sig_atomic_t g_stop = 0;
 
 void LinuxHandler::handle_signal(int)
 {
-    SDL_Event e;
-    e.type = SDL_EVENT_QUIT;
-    SDL_PushEvent(&e);
     g_stop = 1;
 }
 
@@ -30,9 +26,18 @@ LinuxHandler::LinuxHandler()
     }
     signal(SIGINT, handle_signal);
     signal(SIGTERM, handle_signal);
+    m_input_thread = std::thread([this]() { while (!g_stop) CheckInput(); });
 }
 
-bool LinuxHandler::HasInput()
+LinuxHandler::~LinuxHandler()
+{
+    if (m_input_thread.joinable())
+    {
+        m_input_thread.detach();
+    }
+}
+
+void LinuxHandler::CheckInput()
 {
     if (!g_stop)
     {
@@ -43,10 +48,8 @@ bool LinuxHandler::HasInput()
             SDL_Event e;
             e.type = SDL_EVENT_KEY_DOWN;
             SDL_PushEvent(&e);
-            return true;
         }
     }
-    return false;
 }
 
 bool LinuxHandler::HasStop()

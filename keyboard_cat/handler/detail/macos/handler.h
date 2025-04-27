@@ -12,10 +12,9 @@ class DarwinHandler : public BaseHandler
 public:
     DarwinHandler();
     ~DarwinHandler();
-    bool HasInput() override;
+    void CheckInput() override;
     bool HasStop() override;
     void Stop() override;
-
 private:
     void launch(CFMachPortRef EventTap);
     static void handle_signal(int);
@@ -24,10 +23,10 @@ private:
 private:
     bool m_inputFlag = false;
     CFMachPortRef m_event;
-    std::atomic<bool> m_stop{false};
     std::mutex m_mutex;
     std::condition_variable m_cv;
     std::thread m_handler_thread;
+    std::thread m_input_thread;
 };
 
 #endif

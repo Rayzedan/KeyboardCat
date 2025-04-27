@@ -1,60 +1,31 @@
+#include "keyboard_cat/config/config.h"
 #include "keyboard_cat/gif/gif.h"
 #include "keyboard_cat/handler/handler.h"
+#include "keyboard_cat/init/init.h"
 #include "keyboard_cat/renderer/renderer.h"
 #include "keyboard_cat/ui/tray.h"
 #include "keyboard_cat/ui/window.h"
-#include <SDL3/SDL.h>
-#include <SDL3/SDL_tray.h>
+#include <SDL3/SDL_events.h>
 #include <iostream>
-#include <sstream>
 #include <vector>
-#include <thread>
-#include <atomic>
 
-struct Initializer
-{
-    Initializer()
-    {
-        if (!SDL_Init(SDL_INIT_VIDEO))
-        {
-            std::stringstream ss;
-            ss << "Failed to initialize SDL: " << SDL_GetError() << '\n';
-            throw std::runtime_error(ss.str());
-        }
-    }
-
-    ~Initializer()
-    {
-        SDL_Quit();
-    }
-};
+// @TODO: must be configure from CMake
+constexpr std::string_view g_config_path = "config.toml";
 
 int main()
 {
     try
     {
         Initializer init;
-        // TODO: Get settings from user config like json or smth
-        Window& window = Window::Instance(200, 123, -3, -180);
+        Config config;
+        Window& window = Window::Instance(config.Load(g_config_path));
         GifLoader loader;
         const auto frames = loader.GetFrames();
-        if (frames.empty())
-        {
-            throw std::runtime_error("Failed to load GIF: " + std::string(SDL_GetError()));
-        }
         Renderer renderer(window.GetRawWindow(), frames);
         auto handler = make_handler();
         Tray tray;
-        std::atomic<bool> hasInput = false;
-        std::atomic<bool> running = true;
-        std::thread inputThread([&handler, &hasInput, &running]
-        {
-            while (running)
-            {
-                hasInput = handler->HasInput();
-            }
-        });
         renderer.Render();
+        bool running = true;
         while (running)
         {
             SDL_Event event;
@@ -64,11 +35,11 @@ int main()
                 {
                     case SDL_EVENT_QUIT:
                         running = false;
-                        return 0;
+                        handler->Stop();
+                        break;
                     case SDL_EVENT_KEY_DOWN:
                         renderer.Update();
                         renderer.Render();
-                        hasInput = false;
                         break;
                     case SDL_EVENT_MOUSE_BUTTON_DOWN:
                     case SDL_EVENT_MOUSE_BUTTON_UP:
@@ -76,14 +47,19 @@ int main()
                         window.Move(event);
                         break;
                 }
-                if (handler->HasStop())
-                {
-                    running = false;
-                    break;
-                }
+            }
+            if (handler->HasStop())
+            {
+                handler->Stop();
+                running = false;
+                break;
             }
         }
-        inputThread.join();
+        if (!config.Save(g_config_path, window.GetCurrentParameters()))
+        {
+            std::cerr << "Get error while saving new config" << std::endl;
+            return -1;
+        }
     }
     catch (const std::exception& e)
     {

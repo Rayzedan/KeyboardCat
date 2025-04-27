@@ -1,6 +1,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "keyboard_cat/domain/domain.h"
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_video.h>
 #include <SDL3/SDL_tray.h>
@@ -9,20 +10,19 @@
 class Window
 {
 public:
-    static Window& Instance(int width, int heigth, int wX, int wY);
+    static Window& Instance(const ApplicationParameters& parameters);
     void Move(SDL_Event& event);
     SDL_Window* GetRawWindow();
+    ApplicationParameters GetCurrentParameters() const;
 private:
-    Window(int width, int heigth, int wX, int wY);
+    Window(int width, int height, int wX, int wY);
     ~Window();
 private:
     bool m_isDragging;
     int m_width;
-    int m_heigth;
+    int m_height;
     int m_wX;
     int m_wY;
-    int m_mouseX;
-    int m_mouseY;
     std::unique_ptr<SDL_Window*> m_window;
 };
 
