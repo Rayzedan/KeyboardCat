@@ -5,6 +5,7 @@
 #include <linux/input.h>
 #include <fstream>
 #include <thread>
+#include <array>
 
 class LinuxHandler : public BaseHandler
 {
