@@ -11,7 +11,7 @@ Window& Window::Instance(int width, int heigth, int wX, int wY)
 
 
 Window::Window(int width, int heigth, int wX, int wY)
-    : m_width(width), m_heigth(heigth), m_wX(wX), m_wY(wY)
+    : m_isDragging(false), m_width(width), m_heigth(heigth), m_wX(wX), m_wY(wY)
 {
     m_window =
         std::make_unique<SDL_Window*>(SDL_CreateWindow("Bongo Cat", m_width, m_heigth,
@@ -31,8 +31,39 @@ Window::Window(int width, int heigth, int wX, int wY)
         ss << "Failed to get parameters of current display: " << SDL_GetError() << '\n';
         throw std::runtime_error(ss.str());
     }
-     // SDL_SetWindowPosition(*m_window, mode->w / 2 - m_width / 2, mode->h / 2 - m_heigth / 2);
     SDL_SetWindowPosition(*m_window, mode->w - m_width + m_wX, mode->h - m_heigth + m_wY);
+}
+
+void Window::Move(SDL_Event& event)
+{
+    switch (event.type)
+    {
+        case SDL_EVENT_MOUSE_BUTTON_DOWN:
+            if (event.button.button == SDL_BUTTON_LEFT)
+            {
+                m_isDragging = true;
+
+                int windowX, windowY = 0;
+                SDL_GetWindowPosition(*m_window, &windowX, &windowY);
+
+                m_wX = event.button.x - windowX;
+                m_wY = event.button.y - windowY;
+            }
+            break;
+        case SDL_EVENT_MOUSE_BUTTON_UP:
+            if (event.button.button == SDL_BUTTON_LEFT)
+            {
+                m_isDragging = false;
+            }
+            break;
+        case SDL_EVENT_MOUSE_MOTION:
+            if (m_isDragging)
+            {
+                SDL_SetWindowPosition(*m_window, event.motion.x - m_wX,
+                    event.motion.y - m_wY);
+            }
+            break;
+    }
 }
 
 SDL_Window* Window::GetRawWindow()

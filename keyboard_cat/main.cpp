@@ -61,21 +61,26 @@ int main()
             SDL_Event event;
             while (SDL_PollEvent(&event))
             {
-                if (event.type == SDL_EVENT_QUIT)
+                switch (event.type)
                 {
-                    running = false;
-                    break;
+                    case SDL_EVENT_QUIT:
+                        running = false;
+                        return 0;
+                    case SDL_EVENT_KEY_DOWN:
+                        renderer.Update();
+                        renderer.Render();
+                        hasInput = false;
+                        break;
+                    case SDL_EVENT_MOUSE_BUTTON_DOWN:
+                    case SDL_EVENT_MOUSE_BUTTON_UP:
+                    case SDL_EVENT_MOUSE_MOTION:
+                        window.Move(event);
+                        break;
                 }
                 if (handler->HasStop())
                 {
                     running = false;
                     break;
-                }
-                if (event.type == SDL_EVENT_KEY_DOWN)
-                {
-                    renderer.Update();
-                    renderer.Render();
-                    hasInput = false;
                 }
             }
         }
