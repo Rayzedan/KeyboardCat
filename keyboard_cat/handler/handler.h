@@ -7,7 +7,7 @@ class BaseHandler
 {
 public:
     virtual ~BaseHandler() = default;
-    virtual bool HasInput() = 0;
+    virtual void CheckInput() = 0;
     virtual bool HasStop() = 0;
     virtual void Stop() = 0;
 };

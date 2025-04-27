@@ -3,14 +3,15 @@
 
 #include "keyboard_cat/handler/handler.h"
 #include <linux/input.h>
-#include <array>
 #include <fstream>
+#include <thread>
 
 class LinuxHandler : public BaseHandler
 {
 public:
     LinuxHandler();
-    bool HasInput() override;
+    ~LinuxHandler();
+    void CheckInput() override;
     bool HasStop() override;
     void Stop() override;
 private:
@@ -19,6 +20,7 @@ private:
     std::ifstream m_stream;
     std::array<char, sizeof(input_event)> m_dataInput;
     struct input_event m_event;
+    std::thread m_input_thread;
 };
 
 #endif

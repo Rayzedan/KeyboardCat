@@ -48,15 +48,7 @@ int main()
         Renderer renderer(window.GetRawWindow(), frames);
         auto handler = make_handler();
         Tray tray;
-        std::atomic<bool> hasInput = false;
-        std::atomic<bool> running = true;
-        std::thread inputThread([&handler, &hasInput, &running]
-        {
-            while (running)
-            {
-                hasInput = handler->HasInput();
-            }
-        });
+        bool running = true;
         renderer.Render();
         while (running)
         {
@@ -72,7 +64,6 @@ int main()
                     case SDL_EVENT_KEY_DOWN:
                         renderer.Update();
                         renderer.Render();
-                        hasInput = false;
                         break;
                     case SDL_EVENT_MOUSE_BUTTON_DOWN:
                     case SDL_EVENT_MOUSE_BUTTON_UP:
@@ -87,10 +78,6 @@ int main()
                 running = false;
                 break;
             }
-        }
-        if (inputThread.joinable())
-        {
-            inputThread.join();
         }
         if (!config.Save(g_config_path, window.GetCurrentParameters()))
         {
