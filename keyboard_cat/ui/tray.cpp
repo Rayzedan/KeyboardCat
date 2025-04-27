@@ -6,7 +6,9 @@
 
 static void callback_quit([[maybe_unused]] void* handlerPtr, [[maybe_unused]] SDL_TrayEntry* invoker)
 {
-    std::exit(0);
+    SDL_Event event;
+    event.type = SDL_EVENT_QUIT;
+    SDL_PushEvent(&event);
 }
 
 Tray::Tray()

@@ -1,7 +1,6 @@
 #ifndef TRAY_H
 #define TRAY_H
 
-#include "keyboard_cat/handler/handler.h"
 #include <SDL3/SDL_tray.h>
 #include <memory>
 

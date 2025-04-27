@@ -1,20 +1,36 @@
-#include "window.h"
+#include "keyboard_cat/ui/window.h"
 #include <SDL3/SDL_properties.h>
 #include <SDL3/SDL.h>
 #include <sstream>
+#include <iostream>
 
-Window& Window::Instance(int width, int heigth, int wX, int wY)
+Window& Window::Instance(const ApplicationParameters& parameters)
 {
-    static Window window(width, heigth, wX, wY);
+    auto [width, height, wX, wY] = parameters.windowSize;
+    static Window window(width, height, wX, wY);
     return window;
 }
 
 
-Window::Window(int width, int heigth, int wX, int wY)
-    : m_isDragging(false), m_width(width), m_heigth(heigth), m_wX(wX), m_wY(wY)
+static std::pair<int, int> GetDisplaySize(SDL_Window* window)
+{
+    SDL_DisplayID display = SDL_GetDisplayForWindow(window);
+    const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(display);
+    if (mode == nullptr)
+    {
+        std::stringstream ss;
+        ss << "Failed to get parameters of current display: " << SDL_GetError() << '\n';
+        throw std::runtime_error(ss.str());
+    }
+    return { mode->w, mode->h };
+}
+
+
+Window::Window(int width, int height, int wX, int wY)
+    : m_isDragging(false), m_width(width), m_height(height), m_wX(wX), m_wY(wY)
 {
     m_window =
-        std::make_unique<SDL_Window*>(SDL_CreateWindow("Bongo Cat", m_width, m_heigth,
+        std::make_unique<SDL_Window*>(SDL_CreateWindow("Bongo Cat", m_width, m_height,
             SDL_WINDOW_ALWAYS_ON_TOP | SDL_WINDOW_BORDERLESS |
             SDL_WINDOW_TRANSPARENT | SDL_WINDOW_RESIZABLE));
     if (*m_window == nullptr)
@@ -23,15 +39,18 @@ Window::Window(int width, int heigth, int wX, int wY)
         ss << "Failed to create window: " << SDL_GetError() << '\n';
         throw std::runtime_error(ss.str());
     }
-    SDL_DisplayID display = SDL_GetDisplayForWindow(*m_window);
-    const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(display);
-    if (mode == nullptr)
-    {
-        std::stringstream ss;
-        ss << "Failed to get parameters of current display: " << SDL_GetError() << '\n';
-        throw std::runtime_error(ss.str());
-    }
-    SDL_SetWindowPosition(*m_window, mode->w - m_width + m_wX, mode->h - m_heigth + m_wY);
+    auto [displayWidth, displayHeight] = GetDisplaySize(*m_window);
+    SDL_SetWindowPosition(*m_window, displayWidth - m_width + m_wX, displayHeight - m_height + m_wY);
+}
+
+ApplicationParameters Window::GetCurrentParameters() const
+{
+    auto [displayWidth, displayHeight] = GetDisplaySize(*m_window);
+    int x, y;
+    SDL_GetWindowPosition(*m_window, &x, &y);
+    int offsetX = displayWidth - x - m_width;
+    int offsetY = displayHeight - y - m_height;
+    return { m_width, m_height, -1 * offsetX, -1 * offsetY };
 }
 
 void Window::Move(SDL_Event& event)

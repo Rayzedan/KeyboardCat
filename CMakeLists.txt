@@ -20,6 +20,7 @@ endif ()
 
 add_executable(${PROJECT_NAME}
     keyboard_cat/main.cpp
+    keyboard_cat/config/config.cpp
     keyboard_cat/ui/window.cpp
     keyboard_cat/ui/tray.cpp
     ${HANDLER_SOURCE}

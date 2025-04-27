@@ -2,6 +2,8 @@
 #include <SDL3/SDL_events.h>
 #include <atomic>
 #include <cstring>
+#include <iostream>
+#include <signal.h>
 
 std::atomic<bool> g_input = false;
 sig_atomic_t g_stop = 0;
@@ -23,14 +25,15 @@ DarwinHandler::~DarwinHandler()
     {
         CFRelease(m_event);
     }
+    if (m_handler_thread.joinable())
+    {
+        m_handler_thread.detach();
+    }
 }
 
 void DarwinHandler::handle_signal(int sig)
 {
     (void)sig;
-    SDL_Event e;
-    e.type = SDL_EVENT_QUIT;
-    SDL_PushEvent(&e);
     g_stop = 1;
 }
 

@@ -1,3 +1,4 @@
+#include "keyboard_cat/config/config.h"
 #include "keyboard_cat/gif/gif.h"
 #include "keyboard_cat/handler/handler.h"
 #include "keyboard_cat/renderer/renderer.h"
@@ -10,6 +11,8 @@
 #include <vector>
 #include <thread>
 #include <atomic>
+
+constexpr std::string_view g_config_path = "config.toml";
 
 struct Initializer
 {
@@ -34,8 +37,8 @@ int main()
     try
     {
         Initializer init;
-        // TODO: Get settings from user config like json or smth
-        Window& window = Window::Instance(200, 123, -3, -180);
+        Config config;
+        Window& window = Window::Instance(config.Load(g_config_path));
         GifLoader loader;
         const auto frames = loader.GetFrames();
         if (frames.empty())
@@ -64,7 +67,8 @@ int main()
                 {
                     case SDL_EVENT_QUIT:
                         running = false;
-                        return 0;
+                        handler->Stop();
+                        break;
                     case SDL_EVENT_KEY_DOWN:
                         renderer.Update();
                         renderer.Render();
@@ -76,14 +80,22 @@ int main()
                         window.Move(event);
                         break;
                 }
-                if (handler->HasStop())
-                {
-                    running = false;
-                    break;
-                }
+            }
+            if (handler->HasStop())
+            {
+                handler->Stop();
+                running = false;
+                break;
             }
         }
-        inputThread.join();
+        if (inputThread.joinable())
+        {
+            inputThread.join();
+        }
+        if (!config.Save(g_config_path, window.GetCurrentParameters()))
+        {
+            std::cerr << "Get error while saving new config" << std::endl;
+        }
     }
     catch (const std::exception& e)
     {
