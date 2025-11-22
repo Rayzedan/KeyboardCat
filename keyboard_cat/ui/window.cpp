@@ -2,6 +2,7 @@
 #include <SDL3/SDL_properties.h>
 #include <SDL3/SDL.h>
 #include <sstream>
+#include <iostream>
 
 Window& Window::Instance(const ApplicationParameters& parameters)
 {
@@ -60,11 +61,8 @@ void Window::Move(SDL_Event& event)
             {
                 m_isDragging = true;
 
-                int windowX, windowY = 0;
-                SDL_GetWindowPosition(*m_window, &windowX, &windowY);
-
-                m_wX = event.button.x - windowX;
-                m_wY = event.button.y - windowY;
+                m_wX = event.button.x;
+                m_wY = event.button.y;
             }
             break;
         case SDL_EVENT_MOUSE_BUTTON_UP:
@@ -76,8 +74,13 @@ void Window::Move(SDL_Event& event)
         case SDL_EVENT_MOUSE_MOTION:
             if (m_isDragging)
             {
-                SDL_SetWindowPosition(*m_window, event.motion.x - m_wX,
-                    event.motion.y - m_wY);
+                int currentWindowX, currentWindowY;
+                SDL_GetWindowPosition(*m_window, &currentWindowX, &currentWindowY);
+
+                int deltaX = event.motion.x - m_wX;
+                int deltaY = event.motion.y - m_wY;
+
+                SDL_SetWindowPosition(*m_window, currentWindowX + deltaX, currentWindowY + deltaY);
             }
             break;
     }
