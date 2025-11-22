@@ -9,8 +9,11 @@
 #include <iostream>
 #include <vector>
 
-// @TODO: must be configure from CMake
+#ifdef CONFIG_PATH
+constexpr std::string_view g_config_path = CONFIG_PATH;
+#else
 constexpr std::string_view g_config_path = "config.toml";
+#endif
 
 int main()
 {

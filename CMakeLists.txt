@@ -8,6 +8,12 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE INTERNAL "")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wformat -Wformat-security -Werror -O3")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Allow config path to be overridden via CMake option, with default of "config.toml"
+if(NOT DEFINED CONFIG_FILE_PATH)
+    set(CONFIG_FILE_PATH "config.toml")
+endif()
+target_compile_definitions(${PROJECT_NAME} PUBLIC CONFIG_PATH="${CONFIG_FILE_PATH}")
+
 find_package(SDL3 REQUIRED)
 find_package(GIF REQUIRED)
 find_package(tomlplusplus REQUIRED)
