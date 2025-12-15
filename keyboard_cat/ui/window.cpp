@@ -1,6 +1,8 @@
 #include "keyboard_cat/ui/window.h"
+#include "keyboard_cat/ui/window_helper.h"
 #include <SDL3/SDL_properties.h>
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_video.h>
 #include <sstream>
 #include <iostream>
 
@@ -31,7 +33,7 @@ Window::Window(int width, int height, int wX, int wY)
     m_window =
         std::make_unique<SDL_Window*>(SDL_CreateWindow("Bongo Cat", m_width, m_height,
             SDL_WINDOW_ALWAYS_ON_TOP | SDL_WINDOW_BORDERLESS |
-            SDL_WINDOW_TRANSPARENT));
+            SDL_WINDOW_TRANSPARENT | SDL_WINDOW_NOT_FOCUSABLE));
     if (*m_window == nullptr)
     {
         std::stringstream ss;
@@ -40,6 +42,7 @@ Window::Window(int width, int height, int wX, int wY)
     }
     auto [displayWidth, displayHeight] = GetDisplaySize(*m_window);
     SDL_SetWindowPosition(*m_window, displayWidth - m_width + m_wX, displayHeight - m_height + m_wY);
+    ConfigureWindowSpaces(*m_window);
 }
 
 ApplicationParameters Window::GetCurrentParameters() const
