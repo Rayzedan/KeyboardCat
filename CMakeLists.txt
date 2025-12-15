@@ -14,8 +14,10 @@ find_package(tomlplusplus REQUIRED)
 
 if (APPLE)
     set(HANDLER_SOURCE "keyboard_cat/handler/detail/macos/handler.cpp")
+    set(PLATFORM_SOURCES "keyboard_cat/ui/detail/macos/window_helper.mm")
 else ()
     set(HANDLER_SOURCE "keyboard_cat/handler/detail/linux/handler.cpp")
+    set(PLATFORM_SOURCES "")
 endif ()
 
 add_executable(${PROJECT_NAME}
@@ -25,6 +27,7 @@ add_executable(${PROJECT_NAME}
     keyboard_cat/ui/window.cpp
     keyboard_cat/ui/tray.cpp
     ${HANDLER_SOURCE}
+    ${PLATFORM_SOURCES}
     keyboard_cat/handler/handler.cpp
     keyboard_cat/renderer/renderer.cpp
     keyboard_cat/gif/gif.cpp
@@ -62,7 +65,8 @@ if (APPLE)
     find_library(CT_LIB CoreText)
     find_library(CG_LIB CoreGraphics)
     find_library(CF_LIB CoreFoundation)
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${CF_LIB} ${CT_LIB} ${IO_LIB} ${CS_LIB} ${CG_LIB})
+    find_library(APPKIT_LIB AppKit)
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${CF_LIB} ${CT_LIB} ${IO_LIB} ${CS_LIB} ${CG_LIB} ${APPKIT_LIB})
 else()
     macro(copy_helper filename)
         set(outname "${CMAKE_BINARY_DIR}/$<CONFIGURATION>/${filename}")
