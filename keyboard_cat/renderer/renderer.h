@@ -16,7 +16,8 @@ private:
     int m_windowH;
     size_t m_currentFrame;
     const std::vector<SDL_Surface*>& m_frames;
-    std::unique_ptr<SDL_Renderer*> m_renderer;
+    using RendererDeleter = void(*)(SDL_Renderer*);
+    std::unique_ptr<SDL_Renderer, RendererDeleter> m_renderer;
     SDL_Window* m_window;
 };
 

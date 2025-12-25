@@ -23,7 +23,8 @@ private:
     int m_height;
     int m_wX;
     int m_wY;
-    std::unique_ptr<SDL_Window*> m_window;
+    using WindowDeleter = void(*)(SDL_Window*);
+    std::unique_ptr<SDL_Window, WindowDeleter> m_window;
 };
 
 #endif // !WINDOW_H

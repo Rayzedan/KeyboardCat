@@ -1,18 +1,18 @@
 #include "gif.h"
+#include "keyboard_cat/domain/domain.h"
 #include <SDL3/SDL_filesystem.h>
 #include <gif_lib.h>
 #include <filesystem>
 
 GifLoader::GifLoader()
 {
-    auto basePathPtr = SDL_GetBasePath();
+    const auto basePathPtr = SDL_GetBasePath();
     if (basePathPtr == nullptr)
     {
         throw std::runtime_error("Can't get sdl base path");
     }
     const std::filesystem::path basePath = basePathPtr;
-    static const auto filePath = basePath / "hallow_cat.gif";
-
+    static const auto filePath = basePath / std::string(g_gif_filename);
     GifFileType* gifFile = DGifOpenFileName(filePath.string().c_str(), nullptr);
     if (!gifFile)
     {

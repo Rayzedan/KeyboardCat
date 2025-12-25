@@ -3,9 +3,10 @@
 
 #include <cstring>
 #include <signal.h>
+#include <atomic>
 #include <iostream>
 
-sig_atomic_t g_stop = 0;
+std::atomic<bool> g_stop = false;
 
 void LinuxHandler::handle_signal(int)
 {
@@ -26,20 +27,21 @@ LinuxHandler::LinuxHandler()
     }
     signal(SIGINT, handle_signal);
     signal(SIGTERM, handle_signal);
-    m_input_thread = std::thread([this]() { while (!g_stop) CheckInput(); });
+    m_input_thread = std::thread([this]() { while (!g_stop.load()) CheckInput(); });
 }
 
 LinuxHandler::~LinuxHandler()
 {
+    Stop();
     if (m_input_thread.joinable())
     {
-        m_input_thread.detach();
+        m_input_thread.join();
     }
 }
 
 void LinuxHandler::CheckInput()
 {
-    if (!g_stop)
+    if (!g_stop.load())
     {
         m_stream.read(m_dataInput.data(), m_dataInput.size());
         std::memcpy(&m_event, m_dataInput.data(), m_dataInput.size());
@@ -59,8 +61,13 @@ bool LinuxHandler::HasStop()
 
 void LinuxHandler::Stop()
 {
-    SDL_Event e;
-    e.type = SDL_EVENT_QUIT;
-    SDL_PushEvent(&e);
-    g_stop = 1;
+    g_stop = true;
+    if (m_stream.is_open())
+    {
+        m_stream.close();
+    }
+    if (m_input_thread.joinable())
+    {
+        m_input_thread.join();
+    }
 }

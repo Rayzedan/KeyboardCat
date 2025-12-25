@@ -1,9 +1,10 @@
-#ifndef LINUX_HANDLER_H
-#define LINUX_HANDLER_H
+#ifndef DARWIN_HANDLER_H
+#define DARWIN_HANDLER_H
 
 #include "keyboard_cat/handler/handler.h"
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreGraphics/CoreGraphics.h>
+#include <atomic>
 #include <mutex>
 #include <thread>
 
@@ -23,6 +24,7 @@ private:
 private:
     bool m_inputFlag = false;
     CFMachPortRef m_event;
+    std::atomic<CFRunLoopRef> m_runLoop{nullptr};
     std::mutex m_mutex;
     std::condition_variable m_cv;
     std::thread m_handler_thread;

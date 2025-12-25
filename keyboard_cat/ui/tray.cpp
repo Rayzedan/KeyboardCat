@@ -1,4 +1,5 @@
 #include "tray.h"
+#include "keyboard_cat/domain/domain.h"
 #include <SDL3/SDL_filesystem.h>
 #include <SDL3/SDL.h>
 #include <filesystem>
@@ -21,7 +22,7 @@ Tray::Tray()
         throw std::runtime_error(ss.str());
     }
     const std::filesystem::path basePath = basePathPtr;
-    static const auto filePath = basePath / "icon128.bmp";
+    static const auto filePath = basePath / std::string(g_icon_filename);
     m_icon = SDL_LoadBMP(filePath.string().c_str());
     if (m_icon == nullptr)
     {
