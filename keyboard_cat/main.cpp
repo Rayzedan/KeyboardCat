@@ -2,12 +2,12 @@
 #include "keyboard_cat/gif/gif.h"
 #include "keyboard_cat/handler/handler.h"
 #include "keyboard_cat/init/init.h"
+#include "keyboard_cat/logger/logger.h"
 #include "keyboard_cat/renderer/renderer.h"
 #include "keyboard_cat/ui/tray.h"
 #include "keyboard_cat/ui/window.h"
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_timer.h>
-#include <iostream>
 #include <vector>
 
 #ifdef CONFIG_PATH
@@ -20,18 +20,35 @@ int main()
 {
     try
     {
+        Logger::Init();
+        LOG_INFO("Starting Keyboard Cat application");
+
         Initializer init;
+        LOG_DEBUG("SDL initialized");
+
         Config config;
-        Window& window = Window::Instance(config.Load(g_config_path));
+        auto params = config.Load(g_config_path);
+        LOG_DEBUG("Config loaded from: {}", std::string(g_config_path));
+
+        Window& window = Window::Instance(params);
+        LOG_DEBUG("Window created");
+
         GifLoader loader;
         const auto frames = loader.GetFrames();
+        LOG_DEBUG("Loaded {} GIF frames", frames.size());
+
         Renderer renderer(window.GetRawWindow(), frames);
+        LOG_DEBUG("Renderer initialized");
+
         auto handler = make_handler();
         if (!handler)
         {
             throw std::runtime_error("Failed to create keyboard handler for this platform");
         }
+        LOG_DEBUG("Keyboard handler created");
+
         Tray tray;
+        LOG_DEBUG("System tray initialized");
         renderer.Render();
         bool running = true;
         Uint64 lastSaveTime = SDL_GetTicksNS() / 1000000; // Convert to milliseconds
@@ -71,8 +88,13 @@ int main()
             {
                 if (config.Save(g_config_path, window.GetCurrentParameters()))
                 {
+                    LOG_DEBUG("Config auto-saved");
                     configNeedsSave = false;
                     lastSaveTime = currentTime;
+                }
+                else
+                {
+                    LOG_WARN("Failed to auto-save config");
                 }
             }
 
@@ -83,16 +105,20 @@ int main()
                 break;
             }
         }
+
+        LOG_INFO("Application shutting down");
         if (!config.Save(g_config_path, window.GetCurrentParameters()))
         {
-            std::cerr << "Get error while saving new config" << std::endl;
+            LOG_ERROR("Failed to save config on exit");
             return -1;
         }
+        LOG_INFO("Config saved successfully");
     }
     catch (const std::exception& e)
     {
-        std::cerr << "Get error: " << e.what() << std::endl;
+        LOG_CRITICAL("Fatal error: {}", e.what());
         return -1;
     }
+    LOG_INFO("Application terminated normally");
     return 0;
 }

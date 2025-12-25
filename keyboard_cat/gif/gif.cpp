@@ -1,5 +1,6 @@
 #include "gif.h"
 #include "keyboard_cat/domain/domain.h"
+#include "keyboard_cat/logger/logger.h"
 #include <SDL3/SDL_filesystem.h>
 #include <gif_lib.h>
 #include <filesystem>
@@ -13,6 +14,7 @@ GifLoader::GifLoader()
     }
     const std::filesystem::path basePath = basePathPtr;
     static const auto filePath = basePath / std::string(g_gif_filename);
+
     GifFileType* gifFile = DGifOpenFileName(filePath.string().c_str(), nullptr);
     if (!gifFile)
     {
@@ -96,7 +98,7 @@ const std::vector<SDL_Surface*>& GifLoader::GetFrames() const
 {
     if (m_frames.empty())
     {
-        throw std::runtime_error("Failed to load GIF: " + std::string(SDL_GetError()));
+        throw std::runtime_error("Failed to load GIF");
     }
     return m_frames;
 }

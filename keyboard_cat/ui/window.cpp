@@ -1,10 +1,9 @@
 #include "keyboard_cat/ui/window.h"
 #include "keyboard_cat/ui/window_helper.h"
+#include "keyboard_cat/logger/logger.h"
 #include <SDL3/SDL_properties.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_video.h>
-#include <sstream>
-#include <iostream>
 
 Window& Window::Instance(const ApplicationParameters& parameters)
 {
@@ -19,9 +18,7 @@ static std::pair<int, int> GetDisplaySize(SDL_Window* window)
     const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(display);
     if (mode == nullptr)
     {
-        std::stringstream ss;
-        ss << "Failed to get parameters of current display: " << SDL_GetError() << '\n';
-        throw std::runtime_error(ss.str());
+        throw std::runtime_error("Failed to get parameters of current display");
     }
     return { mode->w, mode->h };
 }
@@ -42,9 +39,7 @@ Window::Window(int width, int height, int wX, int wY)
     m_window.reset(rawWindow);
     if (!m_window)
     {
-        std::stringstream ss;
-        ss << "Failed to create window: " << SDL_GetError() << '\n';
-        throw std::runtime_error(ss.str());
+        throw std::runtime_error("Failed to create window");
     }
     auto [displayWidth, displayHeight] = GetDisplaySize(m_window.get());
     SDL_SetWindowPosition(m_window.get(), displayWidth - m_width + m_wX, displayHeight - m_height + m_wY);

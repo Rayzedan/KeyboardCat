@@ -1,5 +1,4 @@
 #include "renderer.h"
-#include <sstream>
 
 Renderer::Renderer(SDL_Window* window, const std::vector<SDL_Surface*>& frames) :
     m_windowW(0),
@@ -16,9 +15,7 @@ Renderer::Renderer(SDL_Window* window, const std::vector<SDL_Surface*>& frames) 
     SDL_Renderer* rawRenderer = SDL_CreateRenderer(m_window, nullptr);
     if (rawRenderer == nullptr)
     {
-        std::stringstream ss;
-        ss << "Failed to create renderer: " << SDL_GetError() << '\n';
-        throw std::runtime_error(ss.str());
+        throw std::runtime_error("Failed to create renderer");
     }
     m_renderer.reset(rawRenderer);
     SDL_GetWindowSize(m_window, &m_windowW, &m_windowH);
