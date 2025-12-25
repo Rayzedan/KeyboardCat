@@ -17,6 +17,7 @@ class KeyboardCatRecipe(ConanFile):
         self.requires("sdl/3.2.6")
         self.requires("giflib/5.2.1")
         self.requires("tomlplusplus/3.4.0")
+        self.requires("fmt/10.2.1")
 
     def generate(self):
         tc = CMakeToolchain(self)

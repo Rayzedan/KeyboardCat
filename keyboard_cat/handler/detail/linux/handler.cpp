@@ -4,7 +4,6 @@
 #include <cstring>
 #include <signal.h>
 #include <atomic>
-#include <iostream>
 
 std::atomic<bool> g_stop = false;
 

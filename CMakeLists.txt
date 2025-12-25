@@ -11,6 +11,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(SDL3 REQUIRED)
 find_package(GIF REQUIRED)
 find_package(tomlplusplus REQUIRED)
+find_package(fmt REQUIRED)
 
 if (APPLE)
     set(HANDLER_SOURCE "keyboard_cat/handler/detail/macos/handler.cpp")
@@ -31,13 +32,16 @@ add_executable(${PROJECT_NAME}
     keyboard_cat/handler/handler.cpp
     keyboard_cat/renderer/renderer.cpp
     keyboard_cat/gif/gif.cpp
+    keyboard_cat/logger/logger.cpp
 )
 
 if(NOT DEFINED CONFIG_FILE_PATH)
     set(CONFIG_FILE_PATH "config.toml")
 endif()
 
-target_compile_definitions(${PROJECT_NAME} PUBLIC CONFIG_PATH="${CONFIG_FILE_PATH}")
+target_compile_definitions(${PROJECT_NAME} PUBLIC
+    CONFIG_PATH="${CONFIG_FILE_PATH}"
+)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -45,6 +49,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     SDL3::SDL3
     GIF::GIF
     tomlplusplus::tomlplusplus
+    fmt::fmt
 )
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC SDL_MAIN_USE_CALLBACKS)
