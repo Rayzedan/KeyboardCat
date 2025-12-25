@@ -6,25 +6,27 @@ Renderer::Renderer(SDL_Window* window, const std::vector<SDL_Surface*>& frames) 
     m_windowH(0),
     m_currentFrame(0),
     m_frames(frames),
+    m_renderer(nullptr, SDL_DestroyRenderer),
     m_window(window)
 {
     if (m_window == nullptr)
     {
         throw std::invalid_argument("Passing invalid window to renderer");
     }
-    m_renderer = std::make_unique<SDL_Renderer*>(SDL_CreateRenderer(m_window, nullptr));
-    if (!m_renderer)
+    SDL_Renderer* rawRenderer = SDL_CreateRenderer(m_window, nullptr);
+    if (rawRenderer == nullptr)
     {
         std::stringstream ss;
         ss << "Failed to create renderer: " << SDL_GetError() << '\n';
         throw std::runtime_error(ss.str());
     }
+    m_renderer.reset(rawRenderer);
     SDL_GetWindowSize(m_window, &m_windowW, &m_windowH);
 }
 
 void Renderer::Render()
 {
-    SDL_Renderer* renderPtr = *m_renderer;
+    SDL_Renderer* renderPtr = m_renderer.get();
     SDL_SetRenderDrawColor(renderPtr, 0, 0, 0, 0);
     SDL_RenderClear(renderPtr);
 

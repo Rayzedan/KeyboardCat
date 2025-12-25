@@ -28,28 +28,34 @@ static std::pair<int, int> GetDisplaySize(SDL_Window* window)
 
 
 Window::Window(int width, int height, int wX, int wY)
-    : m_isDragging(false), m_width(width), m_height(height), m_wX(wX), m_wY(wY)
+    : m_isDragging(false),
+      m_width(width),
+      m_height(height),
+      m_wX(wX),
+      m_wY(wY),
+      m_window(nullptr, SDL_DestroyWindow)
 {
-    m_window =
-        std::make_unique<SDL_Window*>(SDL_CreateWindow("Bongo Cat", m_width, m_height,
+    SDL_Window* rawWindow =
+        SDL_CreateWindow("Bongo Cat", m_width, m_height,
             SDL_WINDOW_ALWAYS_ON_TOP | SDL_WINDOW_BORDERLESS |
-            SDL_WINDOW_TRANSPARENT | SDL_WINDOW_NOT_FOCUSABLE));
-    if (*m_window == nullptr)
+            SDL_WINDOW_TRANSPARENT | SDL_WINDOW_NOT_FOCUSABLE);
+    m_window.reset(rawWindow);
+    if (!m_window)
     {
         std::stringstream ss;
         ss << "Failed to create window: " << SDL_GetError() << '\n';
         throw std::runtime_error(ss.str());
     }
-    auto [displayWidth, displayHeight] = GetDisplaySize(*m_window);
-    SDL_SetWindowPosition(*m_window, displayWidth - m_width + m_wX, displayHeight - m_height + m_wY);
-    ConfigureWindowSpaces(*m_window);
+    auto [displayWidth, displayHeight] = GetDisplaySize(m_window.get());
+    SDL_SetWindowPosition(m_window.get(), displayWidth - m_width + m_wX, displayHeight - m_height + m_wY);
+    ConfigureWindowSpaces(m_window.get());
 }
 
 ApplicationParameters Window::GetCurrentParameters() const
 {
-    auto [displayWidth, displayHeight] = GetDisplaySize(*m_window);
+    auto [displayWidth, displayHeight] = GetDisplaySize(m_window.get());
     int x, y;
-    SDL_GetWindowPosition(*m_window, &x, &y);
+    SDL_GetWindowPosition(m_window.get(), &x, &y);
     int offsetX = displayWidth - x - m_width;
     int offsetY = displayHeight - y - m_height;
     return { m_width, m_height, -1 * offsetX, -1 * offsetY };
@@ -78,12 +84,12 @@ void Window::Move(SDL_Event& event)
             if (m_isDragging)
             {
                 int currentWindowX, currentWindowY;
-                SDL_GetWindowPosition(*m_window, &currentWindowX, &currentWindowY);
+                SDL_GetWindowPosition(m_window.get(), &currentWindowX, &currentWindowY);
 
                 int deltaX = event.motion.x - m_wX;
                 int deltaY = event.motion.y - m_wY;
 
-                SDL_SetWindowPosition(*m_window, currentWindowX + deltaX, currentWindowY + deltaY);
+                SDL_SetWindowPosition(m_window.get(), currentWindowX + deltaX, currentWindowY + deltaY);
             }
             break;
     }
@@ -91,13 +97,9 @@ void Window::Move(SDL_Event& event)
 
 SDL_Window* Window::GetRawWindow()
 {
-    return *m_window;
+    return m_window.get();
 }
 
 Window::~Window()
 {
-    if (m_window)
-    {
-        SDL_DestroyWindow(*m_window);
-    }
 }
